@@ -1,0 +1,5 @@
+{
+	"port": 5000,
+	"jwt": "todo app",
+	"dbUri": "mongodb+srv://ctalkep:r0y9x4w1q2@cluster0.wl2fy.mongodb.net/Cluster0?retryWrites=true&w=majority"
+}
