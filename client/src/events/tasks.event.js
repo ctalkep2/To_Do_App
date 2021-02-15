@@ -4,70 +4,6 @@ export const taskEvents = (auth, request, item, tasks, changeTask, changeItem) =
 		auth.logout();
 	}
 
-	const removeHandler = async e => {
-
-    const data = await request(
-      '/api/tasks/delete',
-      'DELETE',
-      { id: e.target.parentNode.id },
-      {
-        autorization: `Bearer ${auth.token}`
-      }
-    );
-
-    changeTask(data);
-  }
-
-  const priorityUpHandler = async e => {
-
-    const data = await request(
-      '/api/tasks/change',
-      'PUT',
-      { 
-        id: e.target.parentNode.id,
-        command: 'UP'
-      },
-      {
-        autorization: `Bearer ${auth.token}`
-      }
-    );
-
-    if (data) changeTask(data)
-  }
-
-	const priorityDownHandler = async e => {
-
-    const data = await request(
-      '/api/tasks/change',
-      'PUT',
-      { 
-        id: e.target.parentNode.id,
-        command: 'DOWN'
-      },
-      {
-        autorization: `Bearer ${auth.token}`
-      }
-    );
-
-    if (data) changeTask(data)
-  }
-
-	const compliteHandler = async e => {
-    const data = await request(
-      '/api/tasks/change',
-      'PUT',
-      { 
-        id: e.target.parentNode.parentNode.id,
-        command: 'COMPLITED'
-      },
-      {
-        autorization: `Bearer ${auth.token}`
-      }
-    );
-
-    if (data) changeTask(data)
-  }
-
 	const addTask = async e => {
     e.preventDefault();
 
@@ -94,11 +30,7 @@ export const taskEvents = (auth, request, item, tasks, changeTask, changeItem) =
   }
 
 	return { 
-		logoutHadler, 
-		removeHandler, 
-		priorityUpHandler, 
-		priorityDownHandler,
-		compliteHandler,
+		logoutHadler,
 		addTask
 	}
 }

@@ -89,9 +89,7 @@ function Tasks() {
                 key={index}
                 currentItem={currentItem}
                 tasks={tasks}
-                changeTask={changeTask}
-                item={item}                
-                changeItem={changeItem}                  
+                changeTask={changeTask}                  
                 request={request}
                 loading={loading}
               />           

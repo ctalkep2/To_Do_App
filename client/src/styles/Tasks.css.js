@@ -119,19 +119,6 @@ export const CompliteTask = styled.div`
 	cursor: pointer;
 `;
 
-export const TaskEditor = styled.textarea`	
-	display: block;
-	// padding: 5px;
-	width: 100%;
-	border: none;
-	outline: none;
-	resize: none;
-	overflow: hidden;
-	// font-size: 20px;
-	// line-height: 20px;
-	
-`;
-
 export const CheckComplited = styled.div`
 	position: absolute;
 	right: -25px;

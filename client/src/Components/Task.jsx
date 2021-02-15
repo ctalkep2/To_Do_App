@@ -3,14 +3,13 @@ import TaskEditor from 'react-textarea-autosize';
 
 import { AuthContext } from '../context/AuthContext';
 
-import { taskEvents } from '../events/tasks.event';
+import { oneTaskEvents } from '../events/oneTask.event';
 
 import { 
   ArrowDown, 
   ArrowUp, 
   RemoveTask,
   CompliteTask,
-  // TaskEditor,
   CheckComplited
 } from '../styles/Tasks.css';
 
@@ -19,9 +18,7 @@ function Task(props) {
   const { 
     currentItem, 
     tasks, 
-    changeTask, 
-    item, 
-    changeItem, 
+    changeTask,
     request,
     loading } = props;
 
@@ -34,14 +31,15 @@ function Task(props) {
     removeHandler, 
     priorityUpHandler,
     priorityDownHandler,
-    compliteHandler
-  } = taskEvents(
+    compliteHandler,
+    saveEdit
+  } = oneTaskEvents(
     auth, 
-    request, 
-    item, 
+    request,
     tasks, 
-    changeTask, 
-    changeItem
+    changeTask,
+    editTask,
+    currentItem
   );
 
   useEffect(() => {
@@ -53,45 +51,10 @@ function Task(props) {
 
   }, [click, currentItem]);
 
-  const saveEdit = async e => {
-    if (editTask !== currentItem.task) {
-      let oneTask;    
-      let newTasks = tasks.map((elem, index) => {
+  const onBlurAction = async e => {
+    await saveEdit(e)
 
-        if (elem._id === currentItem._id) {
-
-          oneTask = {
-            _id: elem._id,
-            task: editTask,
-            complited: elem.complited,
-            owner: elem.owner,
-            priority: elem.priority,
-            date: elem.date,
-          };
-
-          return oneTask;
-        }
-
-        return elem;
-      });    
-
-      await request(
-        '/api/tasks/change',
-        'PUT',
-        { 
-          task: oneTask,
-          id: currentItem._id,
-          command: 'EDIT'
-        },
-        {
-          autorization: `Bearer ${auth.token}`
-        }
-      );
-
-      changeTask(newTasks);
-    }
-
-    setClick(!click);
+    await setClick(!click);
   }
 
   const beginEditHandler = e => {
@@ -140,7 +103,7 @@ function Task(props) {
               id={currentItem._id + 'editor'}
               value={editTask}
               onChange={changingHandler}
-              onBlur={saveEdit}
+              onBlur={onBlurAction}
             />
 
             }
