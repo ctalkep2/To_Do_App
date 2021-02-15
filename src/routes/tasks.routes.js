@@ -60,6 +60,21 @@ router.put('/change', auth, async (req, res) => {
 			return res.json(data.sort((prev, next) => prev.priority - next.priority));
 		}
 
+		if (req.body.command === 'EDIT') {
+
+			data.forEach(async (elem, index) => {
+
+				if (req.body.id === elem._id.toString()) {
+					await Tasks.updateOne({ _id: elem._id }, req.body.task);
+				}
+
+			});
+
+			return res.status(201).json({ message: 'Changes saved' });
+		}
+
+		if (req.body.command === 'DROP') {}
+
 		res.json(null);
 
 	} catch (e) {

@@ -1,125 +1,152 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import TaskEditor from 'react-textarea-autosize';
+
+import { AuthContext } from '../context/AuthContext';
+
+import { taskEvents } from '../events/tasks.event';
+
+import { 
+  ArrowDown, 
+  ArrowUp, 
+  RemoveTask,
+  CompliteTask,
+  // TaskEditor,
+  CheckComplited
+} from '../styles/Tasks.css';
 
 function Task(props) {
 
-	const removeHandler = async e => {
+  const { 
+    currentItem, 
+    tasks, 
+    changeTask, 
+    item, 
+    changeItem, 
+    request,
+    loading } = props;
 
-		const [activeChange, setActiveChange] = useState(true);
+  const [click, setClick] = useState(false);
+  const [editTask, setEditTask] = useState(currentItem.task);
 
-    const data = await props.request(
-      '/api/tasks/delete',
-      'DELETE',
-      { id: e.target.parentNode.id },
-      {
-        autorization: `Bearer ${props.auth.token}`
-      }
-    );
+  const auth = useContext(AuthContext);  
 
-    setTasks(data);
+  const {
+    removeHandler, 
+    priorityUpHandler,
+    priorityDownHandler,
+    compliteHandler
+  } = taskEvents(
+    auth, 
+    request, 
+    item, 
+    tasks, 
+    changeTask, 
+    changeItem
+  );
 
-  }
+  useEffect(() => {
+    if (click === true) {
+      const editor = document.getElementById(currentItem._id + 'editor');
 
-  const priorityUpHandler = async e => {
+      editor.focus();
+    }    
 
-    const data = await props.request(
-      '/api/tasks/change',
-      'PUT',
-      { 
-        id: e.target.parentNode.id,
-        command: 'UP'
-      },
-      {
-        autorization: `Bearer ${props.auth.token}`
-      }
-    );
+  }, [click, currentItem]);
 
-    if (data) setTasks(data)
-  }
+  const saveEdit = async e => {
+    if (editTask !== currentItem.task) {
+      let oneTask;    
+      let newTasks = tasks.map((elem, index) => {
 
-  const priorityDownHandler = async e => {
+        if (elem._id === currentItem._id) {
 
-    const data = await props.request(
-      '/api/tasks/change',
-      'PUT',
-      { 
-        id: e.target.parentNode.id,
-        command: 'DOWN'
-      },
-      {
-        autorization: `Bearer ${props.auth.token}`
-      }
-    );
+          oneTask = {
+            _id: elem._id,
+            task: editTask,
+            complited: elem.complited,
+            owner: elem.owner,
+            priority: elem.priority,
+            date: elem.date,
+          };
 
-    if (data) setTasks(data)
-  }
+          return oneTask;
+        }
 
-  const changeTask = e => {
-    e.preventDefault();
+        return elem;
+      });    
 
-    setActiveChange(false);
+      await request(
+        '/api/tasks/change',
+        'PUT',
+        { 
+          task: oneTask,
+          id: currentItem._id,
+          command: 'EDIT'
+        },
+        {
+          autorization: `Bearer ${auth.token}`
+        }
+      );
 
-    const textArea = document.createElement("textarea");
-    console.log(e.target.parentNode.children[3])
-    textArea.innerHTML = e.target.parentNode.children[3].innerHTML;
-    textArea.setAttribute('rows', 1)
-
-    e.target.parentNode.replaceChild(
-      textArea,
-      e.target.parentNode.children[3]
-    );
-
-    const autosize = () => {
-
-      setTimeout(() => {
-
-        textArea.style.cssText = 'height:auto; padding:0';
-        textArea.style.cssText = 'height:' + textArea.scrollHeight + 'px';
-
-      }, 0);
+      changeTask(newTasks);
     }
 
-    autosize();
-
-    textArea.addEventListener('keydown', autosize);
+    setClick(!click);
   }
 
-  const applyTask = e => {
-    e.preventDefault();
-
-    setActiveChange(true);
+  const beginEditHandler = e => {
+    setClick(!click);
   }
-	
-	if (props.tasks.length) {
-		props.tasks.map((item, index) => {
-      return (
-        <li 
-          key={index}
-          id={item._id}
-        >
-          <ArrowUp
-            onClick={priorityUpHandler}
-          />
-          <ArrowDown
-            onClick={priorityDownHandler}
-          />
-          <RemoveTask
-            disabled={loading}
-            onClick={removeHandler}
-          />
-          <div>
-            {item.task}
-          </div>
-          {
-            activeChange ?
-            (<ChangeTask onClick={changeTask} />) :
-            (<ApplyTask onClick={applyTask} />)  
-          }     
-        </li>
-      )
-    })
-   } else {
-   	return (<div>EMPTY</div>)
-   }
+
+  const changingHandler = e => {
+    setEditTask(e.target.value);
+  }  
+
+  return (
+    <li
+      id={currentItem._id}
+    >
+      <ArrowUp
+        onClick={priorityUpHandler}
+      />
+      <ArrowDown
+        onClick={priorityDownHandler}
+      />
+      <RemoveTask
+        disabled={loading}
+        onClick={removeHandler}
+      />
+      <CheckComplited>
+        <input
+          id={currentItem._id + 1}
+          onChange={compliteHandler}
+          checked={currentItem.complited} 
+          disabled={loading}
+          type="checkbox"
+        />
+        <label htmlFor={currentItem._id + 1}></label>
+      </CheckComplited>
+        <div>
+          {!click ?           
+            <CompliteTask
+              id={currentItem._id + 'task'}
+              complite={currentItem.complited}
+              onClick={beginEditHandler}
+            >
+              {currentItem.task}
+            </CompliteTask>
+          :           
+            <TaskEditor
+              id={currentItem._id + 'editor'}
+              value={editTask}
+              onChange={changingHandler}
+              onBlur={saveEdit}
+            />
+
+            }
+        </div>
+    </li>              
+  )
 }
 
 export default Task;

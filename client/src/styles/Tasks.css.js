@@ -21,6 +21,7 @@ export const TaskItem = styled.form`
 	
 	margin: 0 auto;
 	width: 80%;
+	font-size: 20px;
 
 	> ul {
 		padding: 0;		
@@ -36,16 +37,15 @@ export const TaskItem = styled.form`
 		border: 1px solid #ccc;
 		border-radius: 5px;
 
-		> textarea {
+		textarea {
 			display: block;
-			padding: 5px;
 			width: 100%;
 			border: none;
 			outline: none;
 			resize: none;
 			overflow: hidden;
-			font-size: 20px;
-			line-height: 20px;
+			font-family: cursive;
+			font-size: 100%;
 		}
 	}
 `;
@@ -109,12 +109,27 @@ export const RemoveTask = styled.button`
 `;
 
 export const CompliteTask = styled.div`	
-	padding: 4px;
-	font-size: 18px;
+	padding: 2px;
+	font-size: 100%;
+	font-family: cursive;
 	color: ${props => (props.complite ? '#ccc' : '#333')};
 	text-decoration: ${props => (props.complite ? 'line-through' : 'unset')};
 	user-select: none;
+	white-space: pre-wrap;
 	cursor: pointer;
+`;
+
+export const TaskEditor = styled.textarea`	
+	display: block;
+	// padding: 5px;
+	width: 100%;
+	border: none;
+	outline: none;
+	resize: none;
+	overflow: hidden;
+	// font-size: 20px;
+	// line-height: 20px;
+	
 `;
 
 export const CheckComplited = styled.div`
