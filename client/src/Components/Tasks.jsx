@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { NavLink } from 'react-router-dom';
 
 import { AuthContext } from '../context/AuthContext';
@@ -7,10 +8,12 @@ import { useHttp } from '../hooks/http.hook';
 
 import { taskEvents } from '../events/tasks.event';
 
+import Skeleton from './Skeleton';
 import Task from './Task';
 
 import { NavBar } from '../styles/NavBar.css';
 import { TaskBody, TaskItem } from '../styles/Tasks.css';
+import { SkeletonWrapCSS, SkeletonCSS } from '../styles/Skeleton.css';
 
 function Tasks() {
 
@@ -18,8 +21,11 @@ function Tasks() {
 
   const auth = useContext(AuthContext);
 
+  const skeleton = [0, 0, 0, 0, 0];
+
   const [item, setItem] = useState('');
   const [tasks, setTasks] = useState([]);
+  const [dataHasLoad, setDataHasLoad] = useState(false);
 
   const changeTask = (data) => {
     setTasks(data);
@@ -46,6 +52,7 @@ function Tasks() {
       });
       
       if (response) setTasks(response);
+      if (response) setDataHasLoad(true);
 
       if (error) {
         auth.logout();
@@ -59,6 +66,53 @@ function Tasks() {
   const itemHandler = e => {
     setItem(e.target.value);
   }
+
+  const onDragEnd = async result => {
+
+    if (!result.destination) {
+      return;
+    }
+
+    const reorderItems = reorder(
+      tasks,
+      result.source.index,
+      result.destination.index
+    );
+
+    const priorityChange = reorderItems.map((item, index) => {
+      return {
+        _id: item._id,
+        task: item.task,
+        complited: item.complited,
+        owner: item.owner,
+        priority: index + 1,
+        date: item.date,
+      }
+    });
+
+    setTasks(priorityChange);
+
+    await request(
+      '/api/tasks/change',
+      'PUT',
+      { 
+        tasks: priorityChange,
+        command: 'DROP'
+      },
+      {
+        autorization: `Bearer ${auth.token}`
+      }
+    );
+    
+  }
+
+  const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+  };
 
   return (
     <div>
@@ -81,22 +135,43 @@ function Tasks() {
           disabled={loading}
         />      
       </TaskBody>
-      <TaskItem>
-        <ul>
-          {tasks.map((currentItem, index) => {
-            return (              
-              <Task
-                key={index}
-                currentItem={currentItem}
-                tasks={tasks}
-                changeTask={changeTask}                  
-                request={request}
-                loading={loading}
-              />           
-            )
-          })}
-        </ul>        
-      </TaskItem> 
+      {dataHasLoad ?
+        <TaskItem>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="droppable">
+              {(provided, snapshot) => (
+                <ul
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {tasks.map((currentItem, index) => (
+                    <Task
+                      key={index}
+                      index={index}
+                      currentItem={currentItem}
+                      tasks={tasks}
+                      changeTask={changeTask}                  
+                      request={request}
+                      loading={loading}
+                    />
+                  ))}
+                  {provided.placeholder}
+                </ul>
+              )}
+            </Droppable>
+          </DragDropContext>     
+        </TaskItem>
+        :
+        <SkeletonWrapCSS>
+          {
+            skeleton.map((item, index) => (
+              <SkeletonCSS key={index} >
+                <Skeleton/>
+              </SkeletonCSS>
+            ))
+          }
+        </SkeletonWrapCSS>
+      }
     </div>
   );
 }

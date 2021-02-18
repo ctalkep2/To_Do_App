@@ -34,8 +34,6 @@ export const TaskItem = styled.form`
 		padding: 5px 10px;
 		padding-left: 30px;
 		padding-right: 35px;
-		border: 1px solid #ccc;
-		border-radius: 5px;
 
 		textarea {
 			display: block;

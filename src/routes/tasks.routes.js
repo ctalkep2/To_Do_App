@@ -15,35 +15,7 @@ router.put('/change', auth, async (req, res) => {
 
 		const findDataIndex = data.findIndex((element, index) => {
 			return element._id.toString() === req.body.id;
-		});
-
-		if (req.body.command === 'UP') {
-			if (findDataIndex === 0) return res.json(null);
-
-			let tmp = data[findDataIndex - 1].priority;
-			data[findDataIndex - 1].priority = data[findDataIndex].priority;
-			data[findDataIndex].priority = tmp;
-
-			data.forEach(async (elem, index) => {
-				await Tasks.updateOne({ _id: elem._id }, elem);
-			});
-
-			return res.json(data.sort((prev, next) => prev.priority - next.priority));
-		} 
-
-		if (req.body.command === 'DOWN') {
-			if (findDataIndex === data.length - 1) return res.json(null);
-
-			let tmp = data[findDataIndex + 1].priority;
-			data[findDataIndex + 1].priority = data[findDataIndex].priority;
-			data[findDataIndex].priority = tmp;
-
-			data.forEach(async (elem, index) => {
-				await Tasks.updateOne({ _id: elem._id }, elem);
-			});
-
-			return res.json(data.sort((prev, next) => prev.priority - next.priority));
-		}
+		});		
 
 		if (req.body.command === 'COMPLITED') {
 
@@ -73,7 +45,13 @@ router.put('/change', auth, async (req, res) => {
 			return res.status(201).json({ message: 'Changes saved' });
 		}
 
-		if (req.body.command === 'DROP') {}
+		if (req.body.command === 'DROP') {
+			const dataTasks = req.body.tasks;
+
+			dataTasks.forEach(async (elem, index) => {
+				await Tasks.updateOne({ _id: elem._id }, elem);
+			});
+		}
 
 		res.json(null);
 

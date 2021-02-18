@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { Draggable } from "react-beautiful-dnd";
 import TaskEditor from 'react-textarea-autosize';
 
 import { AuthContext } from '../context/AuthContext';
 
 import { oneTaskEvents } from '../events/oneTask.event';
 
-import { 
-  ArrowDown, 
-  ArrowUp, 
+import {
   RemoveTask,
   CompliteTask,
   CheckComplited
@@ -15,7 +14,8 @@ import {
 
 function Task(props) {
 
-  const { 
+  const {
+    index,
     currentItem, 
     tasks, 
     changeTask,
@@ -25,12 +25,10 @@ function Task(props) {
   const [click, setClick] = useState(false);
   const [editTask, setEditTask] = useState(currentItem.task);
 
-  const auth = useContext(AuthContext);  
+  const auth = useContext(AuthContext);
 
   const {
-    removeHandler, 
-    priorityUpHandler,
-    priorityDownHandler,
+    removeHandler,
     compliteHandler,
     saveEdit
   } = oneTaskEvents(
@@ -63,52 +61,64 @@ function Task(props) {
 
   const changingHandler = e => {
     setEditTask(e.target.value);
-  }  
+  }
+
+  const getItemStyle = (isDragging, draggableStyle) => ({
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    background: isDragging ? "#fff" : "#fff",
+    ...draggableStyle
+  });
 
   return (
-    <li
-      id={currentItem._id}
-    >
-      <ArrowUp
-        onClick={priorityUpHandler}
-      />
-      <ArrowDown
-        onClick={priorityDownHandler}
-      />
-      <RemoveTask
-        disabled={loading}
-        onClick={removeHandler}
-      />
-      <CheckComplited>
-        <input
-          id={currentItem._id + 1}
-          onChange={compliteHandler}
-          checked={currentItem.complited} 
-          disabled={loading}
-          type="checkbox"
-        />
-        <label htmlFor={currentItem._id + 1}></label>
-      </CheckComplited>
-        <div>
-          {!click ?           
-            <CompliteTask
-              id={currentItem._id + 'task'}
-              complite={currentItem.complited}
-              onClick={beginEditHandler}
-            >
-              {currentItem.task}
-            </CompliteTask>
-          :           
-            <TaskEditor
-              id={currentItem._id + 'editor'}
-              value={editTask}
-              onChange={changingHandler}
-              onBlur={onBlurAction}
+    <Draggable draggableId={currentItem._id + '_' + index} index={index}>
+      {(provided, snapshot) => (
+        <li
+          id={currentItem._id}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={getItemStyle(
+            snapshot.isDragging,
+            provided.draggableProps.style
+          )}
+        >
+          <RemoveTask
+            disabled={loading}
+            onClick={removeHandler}
+          />
+          <CheckComplited>
+            <input
+              id={currentItem._id + 1}
+              onChange={compliteHandler}
+              checked={currentItem.complited} 
+              disabled={loading}
+              type="checkbox"
             />
+            <label htmlFor={currentItem._id + 1}></label>
+          </CheckComplited>
+            <div>
+              {!click ?           
+                <CompliteTask
+                  id={currentItem._id + 'task'}
+                  complite={currentItem.complited}
+                  onClick={beginEditHandler}
+                >
+                  {currentItem.task}
+                </CompliteTask>
+              :           
+                <TaskEditor
+                  id={currentItem._id + 'editor'}
+                  value={editTask}
+                  onChange={changingHandler}
+                  onBlur={onBlurAction}
+                />
 
-            }
-        </div>
-    </li>              
+                }
+            </div>
+        </li>
+      )}
+    </Draggable>             
   )
 }
 

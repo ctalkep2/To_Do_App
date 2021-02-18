@@ -3,6 +3,8 @@ import { useHttp } from '../hooks/http.hook';
 import { NavLink } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
+import Loader from './Loader';
+
 import {
   ProfileCSS,
   Descriptons,
@@ -20,6 +22,7 @@ function Profile() {
     name: '',
     lastName: ''
   });
+  const [dataHasLoad, setDataHasLoad] = useState(false);
 
   useEffect(() => {
     
@@ -29,6 +32,8 @@ function Profile() {
       });
       
       if (response) setProfile(response);
+      if (response) setDataHasLoad(true);
+
       if (error) {
         auth.logout()
       }
@@ -78,7 +83,7 @@ function Profile() {
 
     }
 
-  } 
+  }
 
   return (
     <div>
@@ -92,53 +97,65 @@ function Profile() {
         	Return to tasks
         </NavLink>
       </NavBar>
-      <ProfileCSS>
-        <div style={{padding: '20px'}}>
-          <img src="/img/profile-icon.jpg" alt="profile_img" />
-        </div>
-        <div>
-          <Descriptons>
-            <div>Имя:</div>
-            <div>{profile.name}</div>
-          </Descriptons>
-          <InputProfileCss>
-            <input 
-              name = "name"
-              onChange = {changeHadler}
-            />
-          </InputProfileCss>
-        </div>
-        <div>
-          <Descriptons>
-            <div>Фамилия:</div>
-            <div>{profile.lastName}</div>
-          </Descriptons>
-          <InputProfileCss>
-            <input 
-              name = "lastName"
-              onChange = {changeHadler}
-            />
-          </InputProfileCss>
-        </div>
-        <div>
-          <Descriptons>
-            <div>Email:</div>
-            <div>{profile.email}</div>
-          </Descriptons>  
-        </div>
-        <button
-          onClick = {profileUpdate}
-          disabled = {loading}
+      {dataHasLoad ?
+        <ProfileCSS>
+          <div style={{padding: '20px'}}>
+            <img src="/img/profile-icon.jpg" alt="profile_img" />
+          </div>
+          <div>
+            <Descriptons>
+              <div>Имя:</div>
+              <div>{profile.name}</div>
+            </Descriptons>
+            <InputProfileCss>
+              <input 
+                name = "name"
+                onChange = {changeHadler}
+              />
+            </InputProfileCss>
+          </div>
+          <div>
+            <Descriptons>
+              <div>Фамилия:</div>
+              <div>{profile.lastName}</div>
+            </Descriptons>
+            <InputProfileCss>
+              <input 
+                name = "lastName"
+                onChange = {changeHadler}
+              />
+            </InputProfileCss>
+          </div>
+          <div>
+            <Descriptons>
+              <div>Email:</div>
+              <div>{profile.email}</div>
+            </Descriptons>  
+          </div>
+          <button
+            onClick = {profileUpdate}
+            disabled = {loading}
+          >
+            Сохранить
+          </button>
+          <button
+            onClick = {profileDelete}
+            disabled = {loading}
+          >
+            Удалить профиль
+          </button>
+        </ProfileCSS>
+        :
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            top: '50%'
+          }}
         >
-          Сохранить
-        </button>
-        <button
-          onClick = {profileDelete}
-          disabled = {loading}
-        >
-          Удалить профиль
-        </button>
-      </ProfileCSS>
+          <Loader />
+        </div>
+      }
     </div>
   );
 }

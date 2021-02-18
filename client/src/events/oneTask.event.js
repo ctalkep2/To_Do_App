@@ -14,40 +14,6 @@ export const oneTaskEvents
 
     changeTask(data);
   }
-	
-	const priorityUpHandler = async e => {
-
-    const data = await request(
-      '/api/tasks/change',
-      'PUT',
-      { 
-        id: e.target.parentNode.id,
-        command: 'UP'
-      },
-      {
-        autorization: `Bearer ${auth.token}`
-      }
-    );
-
-    if (data) changeTask(data)
-  }
-
-	const priorityDownHandler = async e => {
-
-    const data = await request(
-      '/api/tasks/change',
-      'PUT',
-      { 
-        id: e.target.parentNode.id,
-        command: 'DOWN'
-      },
-      {
-        autorization: `Bearer ${auth.token}`
-      }
-    );
-
-    if (data) changeTask(data)
-  }
 
 	const compliteHandler = async e => {
     const data = await request(
@@ -105,9 +71,7 @@ export const oneTaskEvents
   }
 
  	return {
-		removeHandler, 
-		priorityUpHandler, 
-		priorityDownHandler,
+		removeHandler,
 		compliteHandler,
 		saveEdit
 	}
