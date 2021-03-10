@@ -7,16 +7,16 @@ export const useRedirect = () => {
 
 	const registartionRedirect = useCallback(() => {
 		setRegistration(true);
-	});
+	}, []);
 
 	const profileRedirect = useCallback(() => {
 		setDeleteProfile(true);
-	});
+	}, []);
 
 	const afterRedirect = useCallback(() => {
 		setRegistration(false);
 		setDeleteProfile(false);
-	});
+	}, []);
 
 	return { 
 		registartionRedirect,
