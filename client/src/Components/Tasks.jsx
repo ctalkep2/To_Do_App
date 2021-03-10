@@ -50,7 +50,7 @@ function Tasks() {
       const response = await request('/api/tasks', 'GET', null, {
         autorization: `Bearer ${auth.token}`
       });
-      
+
       if (response) setTasks(response);
       if (response) setDataHasLoad(true);
 

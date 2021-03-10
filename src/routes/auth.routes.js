@@ -40,6 +40,9 @@ router.post(
 			name: '',
 			lastName: '',
 			email: email,
+			imageName: '',
+			imagePath: '',
+			path: '',
 			owner: user.id
 		});
 

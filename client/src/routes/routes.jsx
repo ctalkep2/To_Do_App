@@ -7,7 +7,7 @@ import Profile from '../Components/Profile';
 import Auth from '../Components/Auth';
 import Login from '../Components/Login';
 
-export const useRoutes = isAuthenticated => {
+export const useRoutes = (isAuthenticated, registration, deleteProfile) => {
 
 	if (isAuthenticated) {
 		return(
@@ -19,6 +19,28 @@ export const useRoutes = isAuthenticated => {
 					<Profile />
 				</Route>
 				<Redirect to="/tasks" />
+			</Switch>
+		);
+	}
+
+	if (registration) {
+		return(
+			<Switch>				
+				<Route path="/login" exact>
+					<Auth />
+				</Route>
+				<Redirect to="/login" />
+			</Switch>
+		);
+	}
+
+	if (deleteProfile) {
+		return(
+			<Switch>				
+				<Route path="/auth" exact>
+					<Auth />
+				</Route>
+				<Redirect to="/auth" />
 			</Switch>
 		);
 	}

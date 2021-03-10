@@ -1,17 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const config = require('config');
-// const bodyParser = require('body-parser');
+// const multer  = require("multer");
+const bodyParser = require('body-parser');
 
 const app = express();
 
 const PORT = 5000 || config.port;
 
-// app.use(bodyParser.urlencoded({
-//   extended: true
-// }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 app.use(express.json({ extended: true }));
+
+// app.use(multer({dest:'src/media/uploads'}).single('file'));
 
 app.use('/auth', require('./src/routes/auth.routes'));
 app.use('/api/profile', require('./src/routes/profile.routes'));

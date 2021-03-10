@@ -45,17 +45,19 @@ function Task(props) {
       const editor = document.getElementById(currentItem._id + 'editor');
 
       editor.focus();
-    }    
+    }
 
   }, [click, currentItem]);
 
   const onBlurAction = async e => {
-    await saveEdit(e)
+    await saveEdit(e);
 
     await setClick(!click);
   }
 
   const beginEditHandler = e => {
+    setEditTask(e.target.innerHTML);
+    
     setClick(!click);
   }
 

@@ -36,6 +36,7 @@ export const LoginCSS = styled.div`
 		margin: 25px 0;
 		padding: 5px 10px;
 		width: 120px;
+		border: none;
 		border-radius: 6%;
 		background-color: #333;
 		color: #ccc;
@@ -44,7 +45,10 @@ export const LoginCSS = styled.div`
 
 	> div > button:hover {
 		background-color: #777;
-		border-color: #777;
+	}
+
+	> div > button:focus {
+		outline: none;
 	}
 
 	> div > button:active {
